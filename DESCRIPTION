@@ -8,4 +8,3 @@ Maintainer: Andreas Kitsche <kitsche@biostat.uni-hannover.de>
 Description: Provides a useful function to generate labelled product type interactioin contrast matrix. Addiionally, several data sets from agricultural and crop sciences are given. 
 Depends: multcomp, ggplot2
 License: GPL
-LazyData: true
