@@ -32,9 +32,9 @@ Additionally, it presents the application of the \verb@iacontrast()@ function in
 \newpage
 
 \section{Usage of iacontrast() function}
-The function \verb@iacontrast()@ generates a labelled product type interaction contrast matrix for the anaylsis of statistical interactions in two-way layouts. The user has to commit the two factor variables \verb@fa@ and \verb@fb@ and the types of the two one-way contrasts \verb@typea@ and \verb@typeb@. Alternatively, the user can apply a-priori defined contrast one-way contrast matrices \verb@cma@ and \verb@cmb@.
+The function \verb@iacontrast()@ generates a labelled interaction contrast matrix for the anaylsis of statistical interactions in two-way layouts. The user has to commit the two factor variables \verb@fa@ and \verb@fb@ and the types of the two one-way contrasts \verb@typea@ and \verb@typeb@. Alternatively, the user can apply a-priori defined one-way contrast matrices \verb@cma@ and \verb@cmb@.
 
-The output is a list with two elements: i) \verb@fab@ a new factor generated via all combinations of the levels of the two factors, ii)\verb@cmab@ labelled interaction contrast matrix
+The output is a list with two elements: i) \verb@fab@ a new factor generated via all combinations of the levels of the two factors from the two-way layout, ii)\verb@cmab@ a labelled interaction contrast matrix
 
 
 In the following the interaction contrast matrix is generated using the Dunnett type contrast (comparisons to a control) for the first factor and the Tukey type contrast (all pairwise comparisons) for the second factor.
@@ -74,9 +74,7 @@ print(xtable(iacontrast(fa=fa, fb=fb, cma=ContrastsA, cmb=ContrastsB)$cmab, digi
 
 \newpage
 \section{Bush beans data set}
-This example was published in \citet[p. 154]{Petersen.1985}. The data used within the \verb@statint@ package are simulated according to those in \cite{Petersen.1985}. 
-
-This experiment was conducted to investigate the effect of row spacing on the yield of different varieties of bush beans. Due to the different growth habits of the considered varieties it was assumed that the spacing effect differs between the varieties. The selected four varieties differ such that "New Era" and "Big Green" form low, bushy plants and the two varieties "Little Gem" and "Red Lake" form erect plants with few branches. The chosen row spacings were of 20, 40 and 60 cm between rows. A randomized complete block design with four blocks and 12 plots per block was used. The yield of dried beans in kilograms per plot was determined after harvest time.
+This example was published in \citet[p. 154]{Petersen.1985}. The data used within the \verb@statint@ package are simulated according to those in \cite{Petersen.1985}. A detailed description of the data set is given in \cite{Petersen.1985} and \cite{Kitsche.2014}
 
 We first analyse the data using a two-way ANOVA while including the block effect as fixed effect.
 
@@ -96,7 +94,7 @@ fm <- lm(Yield ~ Variety * Spacing + Block, data = beans)
 xtable(anova(fm))
 @
 
-As mentioned in \cite{Kitsche.2014} that an alternative ANOVA is also meaningful for this example, where the hierarchical structure between the growth type and the varieties within the growth type is taken into account. The resulting three-factorial ANOVA.
+\cite{Kitsche.2014} mentioned that an alternative ANOVA is also meaningful for this example, where the hierarchical structure between the growth type and the varieties within the growth type is taken into account. The resulting three-factorial ANOVA is given below.
 
 
 <<chunk23, results='asis', echo=FALSE, warning=FALSE>>=
@@ -119,7 +117,7 @@ SpaceMat <- matrix(c(1, -1,  0,
 InteractionMat <- iacontrast(fa=beans$Variety, fb=beans$Spacing, 
                               cma=VarMat, cmb=SpaceMat)
 @
-The hypothesis formulated in terms of the generated interaction contrasts are further tested using the \verb@glht()@ function in the package \verb@multcomp@ \citep{Hothorn.2008}. The corresponding multiplicity adjusted p-values and simutaneous confidence intervals are  available using thew functions \verb@summary()@ and \verb@confint()@. This will generate Table 9 in \cite{Kitsche.2014}.
+The hypothesis formulated in terms of the generated interaction contrasts are further tested using the \verb@glht()@ function in the package \verb@multcomp@ \citep{Hothorn.2008}. The corresponding multiplicity adjusted p-values and simutaneous confidence intervals are  available using the functions \verb@summary()@ and \verb@confint()@. This will generate Table 9 in \cite{Kitsche.2014}.
 <<chunk25, results='hide', echo=TRUE, message=FALSE>>=
 #generating a new factor for the cell means
 beans$VarSpace <- InteractionMat$fab
@@ -148,7 +146,7 @@ confint(MultTest)#calculating simultaneous confidence intervals
 
 \newpage
 \section{Lettuce data set}
-The data set \verb@lettuce@ presents a simulated data set, inspired by the example presented in \cite{Bradu.1974}. The example is an experiment conducted to analyse the effects of soil type and phosphate
+The \verb@lettuce@ data set presents a simulated data set, inspired by the example presented in \cite{Bradu.1974}. The example is an experiment conducted to analyse the effects of soil type and phosphate
 fertilizers on lettuce crops. The primary response variable was dry matter measured in grams per plot.
 Three different soil types, namely S1, S2 and S3, and four different levels of phosphate fertilization
 (including an untreated control) were investigated in a balanced, completely cross-classified treatment
@@ -225,8 +223,9 @@ colnames(SummaryMatrix) <- c("Estimate","Std.Error","t value","Pr(>|t|)")
 print(xtable(SummaryMatrix), size="\\scriptsize")
 @
 
-\newpage{Ethylene data set}
-This data set results from an experiment to analyse ethylene receptor blockers for improvement of postharvest characteristics of Pelargonium zonale hybrids. A detailed description of the experiment can be found in \cite{Kitsche.2014}. 
+\newpage
+\section{Ethylene data set}
+This data set results from an experiment to analyse the effect of ethylene receptor blockers MCP for improvement of postharvest characteristics of \emph{Pelargonium zonale} hybrids. A detailed description of the experiment is given in \cite{Kitsche.2014}. 
 
 <<chunk61, results='hide', echo=TRUE>>=
 data(ethylen)
@@ -259,11 +258,10 @@ The following one-way contrast matrices are used to analyse the ethylene by trea
 <<chunk64, results='hide', echo=TRUE>>=
 #definition of appropriate contrasts
 #1. contrast for the different ethylen treatments
-ContrMat_Ethylen <- matrix(c(1, -1),
-                           
-                           nrow=1, byrow=FALSE)
+ContrMat_Ethylen <- matrix(c(1, -1), nrow=1, byrow=FALSE)
 #2. contrasts for Treatments 
 ContrMat_Treatment <- matrix(c(1/2, 1/2,-1/3,-1/3,-1/3,
+                               
                                  0,   0,   1,  -1,   0,
                                  0,   0,   1,   0,  -1,
                                  0,   0,   0,   1,  -1), 
@@ -277,7 +275,7 @@ ContrMat_Cult <- matrix(c(1/3,1/3,1/3),
 #interaction contrast matrix
 InteractionContrasts<- kronecker(ContrMat_Cult, 
                                                                 
-                                 kronecker(ContrMat_Treatment, ContrMat_Ethylen))
+                       kronecker(ContrMat_Treatment, ContrMat_Ethylen))
 #fitting the appropriate cell means model
 ethylen$CultTreatEth <- with(ethylen, Cult:Treatment:Eth)
 CMM <- lm(Chloro8 ~ CultTreatEth-1, data=ethylen)
@@ -287,6 +285,22 @@ MultTest <- glht(CMM, linfct=mcp(CultTreatEth=InteractionContrasts))
 summary(MultTest)
 confint(MultTest)
 @
+
+For illustrative purposes we additionally demonstrate the analysis of the cultivar by treatment by ethylene interaction. Therefore we consider that all pairwise conparisons of the cultivars are of interest. 
+<<chunk65, results='hide', echo=TRUE>>=
+CultMatrix <- matrix(c(1, -1, 0,
+                       
+                       1,  0,-1,
+                       0,  1,-1), nrow=3, byrow=TRUE)
+InteractionContrasts<- kronecker(CultMatrix, 
+                                                                
+                       kronecker(ContrMat_Treatment, ContrMat_Ethylen))
+MultTest <- glht(CMM, linfct=mcp(CultTreatEth=InteractionContrasts))
+summary(MultTest)
+confint(MultTest)
+@
+
+
 \newpage
 
 \section{Water deficiency data set}
@@ -339,7 +353,7 @@ SummaryMatrix <- matrix(c(MultTest$coefficients,
          MultTest$pvalues), ncol=4, byrow=FALSE)
 rownames(SummaryMatrix) <- names(MultTest$sigma)
 colnames(SummaryMatrix) <- c("Estimate","Std.Error","t value","Pr(>|t|)")
-print(xtable(SummaryMatrix), size="\\scriptsize")
+print(xtable(SummaryMatrix), size="\\small")
 @
 
 
@@ -349,7 +363,7 @@ print(xtable(SummaryMatrix), size="\\scriptsize")
 \section{Oats Field Trial}
 In this section the analysis of statistical interaction in a split-plot field trial is demonstrated. 
 The underlying methodoly is roughly described in \cite{Kitsche.2014}.
-Therefore, the \verb@oats@ dataset from the R add-on package \verb@MASS@ is used \cite{Venables2002}. In this trial the yield of three different varieties of oats was investigated unter four levels of manurial treatment. For a detailed description we refer to the \verb@MASS@ package documentation of the data set. 
+Therefore, the \verb@oats@ dataset from the R add-on package \verb@MASS@ is used \citep{Venables2002}. In this trial the yield of three different varieties of oats was investigated unter four levels of manurial treatment. For a detailed description we refer to the \verb@MASS@ package documentation of the data set. 
 
 
 <<chunk51,, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7, fig.width=15, results='hide'>>=
@@ -395,14 +409,17 @@ xtable(anova(fit))
 Although there is no evidence for an interaction in this trial, we further assume that interest is in the anylsis of the nitrogen by variety interaction for illustrative purposes.  
 <<chunk54, cache=TRUE, echo=TRUE, warning=FALSE, message=FALSE, results='hide'>>=
 InteractionContrasts <- iacontrast(fa=oats$N, fb=oats$V, 
+                                   
                                    typea = "Tukey", typeb = "Tukey", 
+                                   
                                    abbrevnames=list("minlength"=4))
 oats$NV <- InteractionContrasts$fab
-CMM <- lme(Y ~ NV, data=oats, random=~1|B/V)#fitting the cell means model
+#fitting the cell means model
+CMM <- lme(Y ~ NV, data=oats, random=~1|B/V)
 anova(CMM)
 
-# In principle, there may be more appropriate denominator degrees of freedom here. 
-# For consistency with ANOVA we select 43
+# In principle, there may be more appropriate denominator degrees 
+# of freedom here. For consistency with ANOVA we select 43
 MultTest <- glht(CMM, mcp(NV = InteractionContrasts$cmab), df=43)
 summary(MultTest)
 confint(MultTest)
