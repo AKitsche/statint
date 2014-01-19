@@ -142,6 +142,41 @@ confint(MultTest)#calculating simultaneous confidence intervals
 #print(xtable(SummaryMatrix), size="\\tiny")
 @
 
+As an alternative analysis of the spacing by variety interaction the spacing factor could also be suggested as quantitative. In this case the comparison among regression slopes between varieties can be set up. The following code will illustrate this strategy.
+<<chunk27, results='hide', echo=TRUE>>=
+data(beans)
+str(beans)
+fm1 <- lm(Yield ~ Variety*Spacing+ Block, data=beans)
+K <- matrix(c(0 ,0 ,0 ,0 ,0, 0 ,0 ,0 ,1 , 0, 0,
+              
+              0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 , 1, 0,
+              0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 , 0, 1,
+              0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1 ,-1, 0,
+              0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1 , 0,-1,
+              0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 , 1,-1), byrow=TRUE, nrow=6)
+colnames(K) <- names(coef(fm1))
+rownames(K) <- c("LittleGem - BigGreen",
+                 "NewEra    - BigGreen",
+                 "RedLake   - BigGreen",
+                 "LittleGem - NewEra"  ,
+                 "LittleGem - RedLake" ,
+                 "NewEra    - RedLake")
+MultTest <- glht(fm1, linfct = K)
+summary(MultTest)
+@
+
+<<chunk28, results='asis', echo=FALSE>>=
+MultTest <- summary(MultTest)$test
+SummaryMatrix <- matrix(c(MultTest$coefficients,
+         MultTest$sigma,
+         MultTest$tstat,
+         MultTest$pvalues), ncol=4, byrow=FALSE)
+rownames(SummaryMatrix) <- names(MultTest$sigma)
+colnames(SummaryMatrix) <- c("Estimate","Std.Error","t value","Pr(>|t|)")
+print(xtable(SummaryMatrix), size="\\normalsize")
+@
+
+
 
 
 \newpage
