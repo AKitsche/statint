@@ -1,0 +1,415 @@
+\documentclass[12pt]{article}
+%\VignetteEngine{knitr::knitr}
+
+\usepackage{natbib}
+\usepackage{longtable}
+\usepackage{multirow}
+\usepackage{rotating}
+\usepackage{bm}
+\usepackage{booktabs}
+\usepackage[table]{xcolor}
+%\usepackage{ulem}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+
+
+\title{Supporting information for \\
+Analysis of statistical interactions in factorial experiments}
+\author{Andreas Kitsche, Frank Schaarschmidt}
+\begin{document}
+%\VignetteIndexEntry{Using statint package} 
+%\VignettePackage{statint} \\
+
+
+\maketitle
+
+\begin{abstract}
+This manuscript provides some supporting information to the article of \cite{Kitsche.2014}.
+Additionally, it presents the application of the \verb@iacontrast()@ function in the \verb@statint@ package to generate a labelled product type interaction contrast matrix for a detailed analysis of statistical interactions in the two-way layout. Furthermore, the analysis of statistical interactions of some selected data sets from the agronomy and crop sciences are demonstrated in case studies. 
+\end{abstract}
+\tableofcontents
+
+\newpage
+
+\section{Usage of iacontrast() function}
+The function \verb@iacontrast()@ generates a labelled product type interaction contrast matrix for the anaylsis of statistical interactions in two-way layouts. The user has to commit the two factor variables \verb@fa@ and \verb@fb@ and the types of the two one-way contrasts \verb@typea@ and \verb@typeb@. Alternatively, the user can apply a-priori defined contrast one-way contrast matrices \verb@cma@ and \verb@cmb@.
+
+The output is a list with two elements: i) \verb@fab@ a new factor generated via all combinations of the levels of the two factors, ii)\verb@cmab@ labelled interaction contrast matrix
+
+
+In the following the interaction contrast matrix is generated using the Dunnett type contrast (comparisons to a control) for the first factor and the Tukey type contrast (all pairwise comparisons) for the second factor.
+<<chunk11, eval=TRUE, results='hide', echo=TRUE, message=FALSE, tidy=TRUE>>=
+#generating factor variables
+fa <- factor(rep(rep(LETTERS[1:4], rep(3,4)), each=3))
+fb <- factor(rep(rep(c(1,2,3), rep(3,3)), times=4))
+
+#library(devtools)
+
+#install_github(username="AKitsche", repo="statint")
+library(statint)
+iacontrast(fa=fa, fb=fb, typea="Dunnett", typeb="Tukey")
+@
+<<chunk12, results='asis', echo=FALSE, warning=FALSE, message=FALSE>>=
+library(xtable)
+#generating factor variables
+print(xtable(iacontrast(fa=fa, fb=fb, typea="Dunnett", typeb="Tukey")$cmab, digits=0),size="\\scriptsize")
+@
+
+We next demonstrate the usage of prespecified user defined contrasts.
+<<chunk13,  tidy=FALSE, results='hide'>>=
+#generating user defined one-way contrast matrices
+ContrastsA <- matrix(c(1 , 1, -1, -1,
+                       1 ,-1,  0,  0,
+                       0 , 0,  1, -1), nrow=3, byrow=TRUE)
+ContrastsB <- matrix(c(-1, 0.5, 0.5,
+                        0,   1,  -1), nrow=2, byrow=TRUE)
+iacontrast(fa=fa, fb=fb, cma=ContrastsA, cmb=ContrastsB)
+@
+
+\tiny
+<<chunk14, echo=FALSE, results='asis'>>=
+print(xtable(iacontrast(fa=fa, fb=fb, cma=ContrastsA, cmb=ContrastsB)$cmab, digits=1), size="\\scriptsize")
+@
+\normalsize
+
+\newpage
+\section{Bush beans data set}
+This example was published in \citet[p. 154]{Petersen.1985}. The data used within the \verb@statint@ package are simulated according to those in \cite{Petersen.1985}. 
+
+This experiment was conducted to investigate the effect of row spacing on the yield of different varieties of bush beans. Due to the different growth habits of the considered varieties it was assumed that the spacing effect differs between the varieties. The selected four varieties differ such that "New Era" and "Big Green" form low, bushy plants and the two varieties "Little Gem" and "Red Lake" form erect plants with few branches. The chosen row spacings were of 20, 40 and 60 cm between rows. A randomized complete block design with four blocks and 12 plots per block was used. The yield of dried beans in kilograms per plot was determined after harvest time.
+
+We first analyse the data using a two-way ANOVA while including the block effect as fixed effect.
+
+<<chunk21, results='hide', echo=FALSE>>=
+data(beans)
+str(beans)#display the structure of the data set
+beans$Spacing <- factor(beans$Spacing)
+#reorder the levels of the factor Variety
+beans$Variety <-factor(beans$Variety, levels=c("BigGreen", "NewEra", "LittleGem", "RedLake"))
+#generate a new factor variable that combines the variable Variety and Space
+beans$VarSpace <- factor(beans$Variety : beans$Spacing)
+@
+
+<<chunk22, results='asis', echo=FALSE>>=
+#fitting a linear model and calculate an ANOVA
+fm <- lm(Yield ~ Variety * Spacing + Block, data = beans)
+xtable(anova(fm))
+@
+
+As mentioned in \cite{Kitsche.2014} that an alternative ANOVA is also meaningful for this example, where the hierarchical structure between the growth type and the varieties within the growth type is taken into account. The resulting three-factorial ANOVA.
+
+
+<<chunk23, results='asis', echo=FALSE, warning=FALSE>>=
+beans$Type[beans$Variety == "LittleGem" | beans$Variety  == "RedLake"] <- "erect"
+beans$Type[beans$Variety == "BigGreen"  | beans$Variety  == "NewEra" ] <- "bushy"
+xtable(anova(lm(Yield ~ Block + Type + Spacing + Type:Spacing + Type:Variety + Type:Variety:Spacing, data=beans)))
+@
+
+
+Fore a detailed analysis of the variety by spacing interaction we generate the appropriate one-way contrasts according to Table 6 and 7 in \cite{Kitsche.2014}. Afterwards, the corresponding product type interaction contrast matrix (see Table 8 in \cite{Kitsche.2014}) is generated using the \verb@iacontrast()@ function.
+
+<<chunk24, echo=TRUE, results='hide', tidy=TRUE>>=
+VarMat   <- matrix(c(0.5,  0.5, -0.5, -0.5,   
+                                            
+                       1,   -1,    0,    0,                     
+                       0,    0,    1,   -1), nrow=3, byrow=TRUE)
+SpaceMat <- matrix(c(1, -1,  0,
+                     1,  0, -1,
+                     0,  1, -1), nrow=3, byrow=TRUE)
+InteractionMat <- iacontrast(fa=beans$Variety, fb=beans$Spacing, 
+                              cma=VarMat, cmb=SpaceMat)
+@
+The hypothesis formulated in terms of the generated interaction contrasts are further tested using the \verb@glht()@ function in the package \verb@multcomp@ \citep{Hothorn.2008}. The corresponding multiplicity adjusted p-values and simutaneous confidence intervals are  available using thew functions \verb@summary()@ and \verb@confint()@. This will generate Table 9 in \cite{Kitsche.2014}.
+<<chunk25, results='hide', echo=TRUE, message=FALSE>>=
+#generating a new factor for the cell means
+beans$VarSpace <- InteractionMat$fab
+#fitting a cell means model with the new factor
+CMM <- lm(Yield ~ VarSpace + Block -1, data = beans)
+library(multcomp)
+MultTest <- glht(model=CMM, 
+                 
+                 linfct = mcp(VarSpace=InteractionMat$cmab))
+summary(MultTest)#calculating adjusted p-values
+confint(MultTest)#calculating simultaneous confidence intervals
+@
+
+<<chunk26, results='asis', echo=FALSE>>=
+#MultTest <- summary(MultTest)$test
+#SummaryMatrix <- matrix(c(MultTest$coefficients,
+#         MultTest$sigma,
+#         MultTest$tstat,
+#         MultTest$pvalues), ncol=4, byrow=FALSE)
+#rownames(SummaryMatrix) <- names(MultTest$sigma)
+#colnames(SummaryMatrix) <- c("Estimate","Std.Error","t value","Pr(>|t|)")
+#print(xtable(SummaryMatrix), size="\\tiny")
+@
+
+
+
+\newpage
+\section{Lettuce data set}
+The data set \verb@lettuce@ presents a simulated data set, inspired by the example presented in \cite{Bradu.1974}. The example is an experiment conducted to analyse the effects of soil type and phosphate
+fertilizers on lettuce crops. The primary response variable was dry matter measured in grams per plot.
+Three different soil types, namely S1, S2 and S3, and four different levels of phosphate fertilization
+(including an untreated control) were investigated in a balanced, completely cross-classified treatment
+structure, laid out as completely randomized design with four replications per treatment combination.
+
+<<chunk31, cache=TRUE, message=FALSE, results='hide'>>=
+data(lettuce)
+str(lettuce)
+#reorder Fertilizer levels
+lettuce$Fertilizer <- factor(lettuce$Fertilizer, 
+                             
+        levels=c("control","cal.phos", "magn.phos","pot.metaphos"))
+@
+
+<<chunk32, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7, fig.width=15>>=
+library(ggplot2)
+p <- ggplot(lettuce, aes(Fertilizer, Weight))
+p + geom_boxplot() + 
+    facet_grid(. ~ Soil) + 
+    theme(text = element_text(size=15)) +
+    ylab("Dry matter (g/plot)")
+@
+
+The fertilizer factor consists of
+an untreated control group and three different phosphorus fertilizers. Objective for this factor is to
+estimate the increase in yield that results applying each of the fertilizers compared to the untreated
+control. The second factor, soil type, contains no
+further substructure, and interest is in comparing all three soil types among each other. The product type interaction contrasts allow to
+interpret to what extend the difference in yield between the three phosphate fertilizers compared to
+the control varies between the three soil types.
+
+<<chunk33, results='asis', echo=FALSE>>=
+#fitting a linear model and calculate an ANOVA
+fm <- lm(Weight ~ Fertilizer * Soil, data = lettuce)
+xtable(anova(fm))
+@
+
+The interaction contrasts compare the differences
+of the fertilizer effects between the soil types, where the fertilizer effects of interest are restricted
+to the differences of each fertilizer to the control group. 
+To test the corresponding hypothesis fomulated by the interaction contrasts the function \verb@glht()@ in the package \verb@multcomp@ \citep{Hothorn.2008} is used. The corresponding multiplicity adjusted p-values and simutaneous confidence intervals are  available using thew functions \verb@summary()@ and \verb@confint()@.
+
+<<chunk34, results='hide', echo=TRUE>>=
+#define appropriate user defined contrast matrices 
+SoilMatrix <- matrix(c(1, -1, 0,
+                       
+                       1,  0,-1,
+                       0,  1,-1), nrow=3, byrow=TRUE)
+FertMatrix <- matrix(c(1, -1, 0, 0,
+                       1,  0,-1, 0,
+                       1,  0, 0,-1),nrow=3, byrow=TRUE)
+InteractionContrasts <- iacontrast(fa=lettuce$Fertilizer, 
+                                   fb=lettuce$Soil,
+                                   cma=FertMatrix, 
+                                   cmb=SoilMatrix)
+lettuce$FertSoil <- InteractionContrasts$fab
+#fitting a cell means model
+CMM <- lm(Weight ~ FertSoil -1, data = lettuce)
+#Multiple Comparisons
+MultTest <- glht(model=CMM, 
+                 linfct = mcp(FertSoil=InteractionContrasts$cmab))
+summary(MultTest)#calculating adjusted p-values
+confint(MultTest)#calculating simultaneous confidence intervals
+@
+
+<<chunck35, echo=FALSE, results='asis'>>=
+MultTest <- summary(MultTest)$test
+SummaryMatrix <- matrix(c(MultTest$coefficients,
+         MultTest$sigma,
+         MultTest$tstat,
+         MultTest$pvalues), ncol=4, byrow=FALSE)
+rownames(SummaryMatrix) <- names(MultTest$sigma)
+colnames(SummaryMatrix) <- c("Estimate","Std.Error","t value","Pr(>|t|)")
+print(xtable(SummaryMatrix), size="\\scriptsize")
+@
+
+\newpage{Ethylene data set}
+This data set results from an experiment to analyse ethylene receptor blockers for improvement of postharvest characteristics of Pelargonium zonale hybrids. A detailed description of the experiment can be found in \cite{Kitsche.2014}. 
+
+<<chunk61, results='hide', echo=TRUE>>=
+data(ethylen)
+str(ethylen)
+ethylen$Cult  <- factor(ethylen$Cult, 
+                        
+                        levels=c(1,2,3),
+                        labels=c("cultivar 1","cultivar 2","cultivar 3"))
+ethylen$Treatment  <- factor(ethylen$Treatment, 
+                             levels=c("control","water","prod1","prod2","prod3"))
+@
+
+<<chunk62, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7, fig.width=15 >>=
+library(ggplot2)
+#Example for Chloro8 endpoint
+p <- ggplot(ethylen, aes(Treatment, Chloro8))
+p + geom_boxplot(aes(fill= Eth)) + 
+  facet_grid(. ~ Cult) + 
+  ylab("Chlorophyll content (mg/g fresh weight)") +
+  labs(fill = "Ethylen") +
+  theme(text = element_text(size=20))
+@
+
+<<chunk63, results='asis', echo=FALSE>>=
+#fitting a linear model and conducting an ANOVA
+fm1 <- lm(Chloro8 ~ Cult*Eth*Treatment, data=ethylen)
+xtable(anova(fm1))
+@
+The following one-way contrast matrices are used to analyse the ethylene by treatment interaction. 
+<<chunk64, results='hide', echo=TRUE>>=
+#definition of appropriate contrasts
+#1. contrast for the different ethylen treatments
+ContrMat_Ethylen <- matrix(c(1, -1),
+                           
+                           nrow=1, byrow=FALSE)
+#2. contrasts for Treatments 
+ContrMat_Treatment <- matrix(c(1/2, 1/2,-1/3,-1/3,-1/3,
+                                 0,   0,   1,  -1,   0,
+                                 0,   0,   1,   0,  -1,
+                                 0,   0,   0,   1,  -1), 
+                             nrow=4, byrow=TRUE)
+@
+Since there is also a significant cultivar by treatment by ethylene interaction, the interaction contrast matrix has to be defined manually by using the Kronecker product. 
+<<chunk64b, results='hide', echo=TRUE>>=
+ContrMat_Cult <- matrix(c(1/3,1/3,1/3),
+                        
+                        nrow=1)
+#interaction contrast matrix
+InteractionContrasts<- kronecker(ContrMat_Cult, 
+                                                                
+                                 kronecker(ContrMat_Treatment, ContrMat_Ethylen))
+#fitting the appropriate cell means model
+ethylen$CultTreatEth <- with(ethylen, Cult:Treatment:Eth)
+CMM <- lm(Chloro8 ~ CultTreatEth-1, data=ethylen)
+
+library(multcomp)
+MultTest <- glht(CMM, linfct=mcp(CultTreatEth=InteractionContrasts))
+summary(MultTest)
+confint(MultTest)
+@
+\newpage
+
+\section{Water deficiency data set}
+This data set was part of an experiment conducted at the Woody Plant and Propagation Physiology Section in the Institute of Horticultural Production Systems at the Leibniz Universität Hannover in 2013. The goal of the experiment was to investigate a potential differing response among nine varieties of starch potato (Solanum tuberosum) on water deficiency stress.  The following nine varieties of starch potato were selected for cultivation: A, B, C, D, E, F, G, H and I. Each variety was cultivated under four different water conditions: standard control medium, 0.1M, 0.2M and 0.3M sorbitol medium. An increasing sorbitol concentration was used to induce an increasing water deficiency stress on the plants. For each treatment by variety combination 6 replicates were investigated. The trial was planned in a completely cross-classified treatment structure, in a completely randomized design. A total number of 13 objects were discarded from the analysis because of infection diseases. For each experimental unit the fresh weight of the shoot was measured. To achieve approximately equal variances over the factor levels of the response variable a log transformation was performed.
+
+
+<<chunk41a, echo=TRUE, warning=FALSE, message=FALSE, results='hide'>>=
+library(statint)
+data(potato)
+str(potato)
+potato$treatment <- factor(potato$treatment, 
+                           
+                           levels=c("control","0.1","0.2","0.3"))
+@
+<<chunk41, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7, fig.width=15>>=
+library(ggplot2)
+p <- ggplot(potato, aes(treatment, shoot))
+p + geom_boxplot() + 
+    facet_grid(. ~ genotype) + 
+    scale_y_log10()+
+    theme(text = element_text(size=15)) +
+    ylab("Shoot fresh weight")
+@
+
+The researcher was interested in selecting those varieties with a different response on water deficiency in contrast to the general water deficiency response. Additionally, interest was in determining on which level of water deficiency stress those potential deviations occur.  
+<<chunk42, results='asis', echo=FALSE, warning=FALSE, message=FALSE>>=
+fm1 <- lm(log(shoot) ~ treatment*genotype, data=potato)
+xtable(anova(fm1))
+@
+
+<<chunk43, results='hide', echo=TRUE>>=
+InteractionContrasts <- iacontrast(fa=potato$treatment, 
+                                   fb=potato$genotype,
+           
+                                    typea="Dunnett", typeb="GrandMean")
+potato$GenTreat <- InteractionContrasts$fab
+CellMeansModel <- lm(log(shoot) ~ GenTreat-1, data=potato)  
+#conducting user defined multiple comparisons
+MultTest <- glht(model=CellMeansModel, 
+                 linfct = mcp(GenTreat=InteractionContrasts$cmab))
+summary(MultTest)#calculating adjusted p-values
+ConfInt <- confint(MultTest)#calculating simultaneous confidence intervals
+@
+
+<<chunk44, results='asis', echo=FALSE>>=
+MultTest <- summary(MultTest)$test
+SummaryMatrix <- matrix(c(MultTest$coefficients,
+         MultTest$sigma,
+         MultTest$tstat,
+         MultTest$pvalues), ncol=4, byrow=FALSE)
+rownames(SummaryMatrix) <- names(MultTest$sigma)
+colnames(SummaryMatrix) <- c("Estimate","Std.Error","t value","Pr(>|t|)")
+print(xtable(SummaryMatrix), size="\\scriptsize")
+@
+
+
+
+\newpage
+
+\section{Oats Field Trial}
+In this section the analysis of statistical interaction in a split-plot field trial is demonstrated. 
+The underlying methodoly is roughly described in \cite{Kitsche.2014}.
+Therefore, the \verb@oats@ dataset from the R add-on package \verb@MASS@ is used \cite{Venables2002}. In this trial the yield of three different varieties of oats was investigated unter four levels of manurial treatment. For a detailed description we refer to the \verb@MASS@ package documentation of the data set. 
+
+
+<<chunk51,, cache=TRUE, echo=FALSE, warning=FALSE, message=FALSE, fig.height=7, fig.width=15, results='hide'>>=
+data(oats, package="MASS")
+str(oats)
+
+# Split plot design, with 6 block
+# within each block, the 3 varieties are randomized at the mainplot level,
+# within each mainplot, the 4 nitrogen treatments are randomized at subplot level.
+
+# Response variable is the yield, Y, in 1/4lbs per subplot (1/80 acre)
+library(ggplot2)
+p <- ggplot(oats, aes(x=N, y=Y, group=B))
+p + geom_line(aes(colour=B),size=1.5) +
+    facet_grid(. ~ V) +
+    theme(text = element_text(size=20))+
+    ylab("Yields in 1/4lbs per sub-plot")+
+    xlab("Nitrogen treatment")+
+    labs(colour = "Block")
+
+@
+
+<<chunk52, results='hide', echo=TRUE, warning=FALSE, message=FALSE>>=
+library(nlme)
+fit <- lme( Y ~ N + V + N:V, data=oats, random=~1|B/V)
+anova(fit)
+@
+
+
+<<chunk53, results='asis', echo=FALSE, warning=FALSE, message=FALSE>>=
+
+# B identifies the blocks
+# B:V is an identifier of the mainplots
+# Interest may be in nitrogen (N), variety (V) main-effects and their interaction (N:V).
+
+library(nlme)
+fit <- lme( Y ~ N + V + N:V, data=oats, random=~1|B/V)
+#anova(fit)
+library(xtable)
+xtable(anova(fit))
+@
+
+Although there is no evidence for an interaction in this trial, we further assume that interest is in the anylsis of the nitrogen by variety interaction for illustrative purposes.  
+<<chunk54, cache=TRUE, echo=TRUE, warning=FALSE, message=FALSE, results='hide'>>=
+InteractionContrasts <- iacontrast(fa=oats$N, fb=oats$V, 
+                                   typea = "Tukey", typeb = "Tukey", 
+                                   abbrevnames=list("minlength"=4))
+oats$NV <- InteractionContrasts$fab
+CMM <- lme(Y ~ NV, data=oats, random=~1|B/V)#fitting the cell means model
+anova(CMM)
+
+# In principle, there may be more appropriate denominator degrees of freedom here. 
+# For consistency with ANOVA we select 43
+MultTest <- glht(CMM, mcp(NV = InteractionContrasts$cmab), df=43)
+summary(MultTest)
+confint(MultTest)
+@
+
+
+
+\bibliographystyle{apalike}
+\bibliography{References_HortInt}
+\end{document}

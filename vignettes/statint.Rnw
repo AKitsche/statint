@@ -1,0 +1,28 @@
+\documentclass[12pt]{article}
+%\VignetteEngine{knitr::knitr}
+
+
+\usepackage{geometry}
+\usepackage[utf8]{inputenc}
+
+\title{Analysis of statistical interactions}
+\author{Andreas Kitsche, Frank Schaarschmidt}
+\begin{document}
+%\VignetteIndexEntry{Using statint} \\
+%\VignettePackage{statint} \\
+
+
+\maketitle
+
+\begin{abstract}
+This documentation presents the application of the \verb@iacontrast()@ function in the \verb@statint@ package to generate a labelled product type interaction contrast matrix for detailed analysis of statistical interactions in the two-way layout. The manuscript provides the analysis of statistical interactions of some agronomy and crop science data sets. For a detailed desciption of the underlying mehodology we refer to the corresponding article: A. Kitsche, F. Schaarschmidt. Analysis of statistical interactions in factorial experiments. \emph{Journal of Agronomy and Crop Science}, 2014.
+\end{abstract}
+
+\section{Lettuce data set}
+The data set \verb@lettuce@ presents a simulated data set, inspired by the example presented in Bradu and Gabriel.
+<<chunk1, cache=TRUE, >>=
+
+@
+
+
+\end{document}
