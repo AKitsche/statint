@@ -142,26 +142,31 @@ confint(MultTest)#calculating simultaneous confidence intervals
 #print(xtable(SummaryMatrix), size="\\tiny")
 @
 
-As an alternative analysis of the spacing by variety interaction the spacing factor could also be suggested as quantitative. In this case the comparison among regression slopes between varieties can be set up. The following code will illustrate this strategy.
-<<chunk27, results='hide', echo=TRUE>>=
+As an alternative analysis of the spacing by variety interaction the spacing factor could also be suggested as quantitative. In this case the comparison among regression slopes between varieties can be set up. Again it is assumed that interest is in the comparisons of the regression slopes berween the different growth types and in comparisons of the varieties within the different growth types. 
+
+For tha sake of simpicity we fit a linear mixed model assuming the Block as random factor. 
+<<chunk27, echo=TRUE, results='hide'>>=
 data(beans)
 str(beans)
-fm1 <- lm(Yield ~ Variety*Spacing+ Block, data=beans)
-K <- matrix(c(0 ,0 ,0 ,0 ,0, 0 ,0 ,0 ,1 , 0, 0,
+beans$Variety <-factor(beans$Variety, levels=c("BigGreen", 
+                                               "NewEra", 
+                                               "LittleGem", 
+                                               "RedLake"))
+beans$Spacing <- as.numeric(beans$Spacing)
+library(nlme)
+fm1 <- lme(Yield ~ Variety+Variety:Spacing-1, data=beans, 
+                                              random= ~ 1|Block)
+#Generating user defined contrasts of regression slopes
+Contrasts_Slopes <- matrix(c(0 , 0, 0, 0, 0.5, 0.5,-0.5,-0.5,
               
-              0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 , 1, 0,
-              0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 , 0, 1,
-              0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1 ,-1, 0,
-              0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1 , 0,-1,
-              0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 , 1,-1), byrow=TRUE, nrow=6)
-colnames(K) <- names(coef(fm1))
-rownames(K) <- c("LittleGem - BigGreen",
-                 "NewEra    - BigGreen",
-                 "RedLake   - BigGreen",
-                 "LittleGem - NewEra"  ,
-                 "LittleGem - RedLake" ,
-                 "NewEra    - RedLake")
-MultTest <- glht(fm1, linfct = K)
+                             0 , 0, 0, 0, 1  ,  -1,   0,   0,
+                             0 , 0, 0, 0, 0  ,   0,   1,  -1), 
+                           byrow=TRUE, 
+                           nrow=3)
+row.names(Contrasts_Slopes) <- c("Bushy-Tall",
+                                 "Big Green-New Era",
+                                 "Little Gem-Red Lake")
+MultTest <- glht(fm1, linfct = Contrasts_Slopes)
 summary(MultTest)
 @
 
