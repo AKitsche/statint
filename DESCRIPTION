@@ -6,7 +6,7 @@ Date: 2014-01-10
 Author: Andreas Kische, Frank Schaarschmidt
 Maintainer: Andreas Kitsche <kitsche@biostat.uni-hannover.de>
 Description: Provides a useful function to generate labelled product type interactioin contrast matrix. Addiionally, several data sets from agricultural and crop sciences are given. 
-Depends: multcomp
+Depends: multcomp, ggplot2, reshape2
 VignetteBuilder: knitr
 Suggests: knitr, ggplot2, reshape2
 LazyLoad: yes

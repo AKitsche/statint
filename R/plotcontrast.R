@@ -7,6 +7,7 @@ plotcontrast <- function(cmat){
   dcm$comparison <- factor(dcm$comparison, levels=rev(rownames(cmat)))
   pp <- ggplot(dcm, aes(y=comparison, x=treatment)) + 
     theme_grey() +
+    theme(axis.text = element_text(colour = "black")) +
     geom_tile(aes(fill=coefficient), colour="black") +
     scale_fill_gradient2(low = "red", mid = "white", high = "blue", midpoint = 0) 
   
