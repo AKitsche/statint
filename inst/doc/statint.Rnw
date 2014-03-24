@@ -26,7 +26,7 @@
 
 \begin{abstract}
 This manuscript provides some supporting information to the article \textbf{Analysis of statistical interactions in factorial experiments} \citep{Kitsche.2014}.
-It presents the application of the \verb@iacontrast()@ function in the \verb@statint@ package to generate a labelled product type interaction contrast matrix for a detailed analysis of statistical interactions in the two-way layout. Furthermore, the analysis of statistical interactions of some selected data sets from the agronomy and crop sciences are demonstrated in case studies. 
+It presents the application of the \verb@iacontrast()@ and \verb@plotcontrast()@ function in the \verb@statint@ package to generate a labelled product type interaction contrast matrix for a detailed analysis of statistical interactions in the two-way layout. Furthermore, the analysis of statistical interactions of some selected data sets from the agronomy and crop sciences are demonstrated in case studies. 
 \end{abstract}
 \tableofcontents
 
@@ -63,6 +63,14 @@ library(xtable)
 print(xtable(iacontrast(fa=fa, fb=fb, typea="Dunnett", typeb="Tukey")$cmab, digits=0),size="\\scriptsize")
 @
 
+The function \verb@plotcontrast()@ plots a contrast matrix in a tile plane with rectangles. It requires a contrast matrix in which the rownames represent the names for the comparisons of interest and the colnames represent the levels of the factor of interest. Contrast coefficients with a negative sign are displayed in red, whereas contrast coefficients with a positive are displayed in blue. 
+
+<<chunk12b, echo=TRUE, warning=FALSE, message=FALSE, fig.height=5, fig.width=10>>=
+IntContrastMat <- iacontrast(fa=fa, fb=fb, typea="Dunnett", typeb="Tukey")
+plotcontrast(IntContrastMat$cmab)
+@
+
+
 We next demonstrate the usage of prespecified user defined contrasts.
 <<chunk13,  tidy=FALSE, results='hide'>>=
 #generating user defined one-way contrast matrices
@@ -80,6 +88,10 @@ print(xtable(iacontrast(fa=fa, fb=fb, cma=ContrastsA, cmb=ContrastsB)$cmab, digi
 @
 \normalsize
 
+<<chunk14b, echo=TRUE, warning=FALSE, message=FALSE, fig.height=5, fig.width=10>>=
+IntContrastMat <- iacontrast(fa=fa, fb=fb, cma=ContrastsA, cmb=ContrastsB)
+plotcontrast(IntContrastMat$cmab)
+@
 
 \newpage
 \section{Lettuce data set}

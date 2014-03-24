@@ -2,10 +2,10 @@
 \alias{plotcontrast}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Function to plot contrast matrix in a tile plane with rectangles
+Function to plot a contrast matrix in a tile plane with rectangles
 }
 \description{
-This function plots a matrix of contrast in a tile plane with rectangles. Is is very useful to disply more complicated contrast matrices like product type interaction contrast matrices.
+This function plots a matrix of contrasts in a tile plane with rectangles. It is very useful to display more complicated contrast matrices like product type interaction contrast matrices.
 }
 \usage{
 plotcontrast(cmat)
@@ -13,7 +13,7 @@ plotcontrast(cmat)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{cmat}{
-a contrast matrix with rownames a the names comparisons of interest and colnames as the levels of a factor
+a contrast matrix in which the rownames represent the names for the comparisons of interest and the colnames represent the levels of the factor of interest
 }
 }
 \details{
