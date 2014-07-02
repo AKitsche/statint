@@ -1,0 +1,6 @@
+\contentsline {section}{\numberline {1}Usage of iacontrast() function}{2}{section.1}
+\contentsline {section}{\numberline {2}Lettuce data set}{5}{section.2}
+\contentsline {section}{\numberline {3}Bush beans data set}{8}{section.3}
+\contentsline {section}{\numberline {4}Ethylene data set}{11}{section.4}
+\contentsline {section}{\numberline {5}Water deficiency data set}{14}{section.5}
+\contentsline {section}{\numberline {6}Oats Field Trial}{16}{section.6}

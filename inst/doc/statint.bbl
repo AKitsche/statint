@@ -1,0 +1,32 @@
+\begin{thebibliography}{}
+
+\bibitem[Bradu and Gabriel, 1974]{Bradu.1974}
+Bradu, D. and Gabriel, K.~R. (1974).
+\newblock {S}imultaneous {S}tatistical {I}nference on {I}nteractions in
+  {T}wo-{W}ay {A}nalysis of {V}ariance.
+\newblock {\em Journal of the American Statistical Association},
+  69(346):428--436.
+
+\bibitem[Hothorn et~al., 2008]{Hothorn.2008}
+Hothorn, T., Bretz, F., and Westfall, P. (2008).
+\newblock {S}imultaneous inference in general parametric models.
+\newblock {\em Biometrical Journal}, 50(3):346--363.
+
+\bibitem[Kitsche and Schaarschmidt, 2014]{Kitsche.2014}
+Kitsche, A. and Schaarschmidt, F. (2014).
+\newblock Analysis of statistical interactions in factorial experiments.
+\newblock {\em Journal of Agronomy and Crop Science}.
+
+\bibitem[Petersen, 1985]{Petersen.1985}
+Petersen, R.~G. (1985).
+\newblock {\em {D}esign and analysis of experiments}, volume~66 of {\em
+  {S}tatistics}.
+\newblock Dekker, New York NY u.a.
+
+\bibitem[Venables and Ripley, 2002]{Venables2002}
+Venables, W.~N. and Ripley, B.~D. (2002).
+\newblock {\em Modern Applied Statistics with S}.
+\newblock Springer, New York, fourth edition.
+\newblock ISBN 0-387-95457-0.
+
+\end{thebibliography}

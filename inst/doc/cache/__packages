@@ -1,0 +1,10 @@
+base
+ggplot2
+knitr
+multcomp
+mvtnorm
+nlme
+SimComp
+statint
+survival
+xtable
