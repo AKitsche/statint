@@ -9,7 +9,7 @@ citEntry(entry="Article",
          textVersion =
          paste("Andreas Kitsche and Frank Schaarschmidt (2014).", 
                "Analysis of Statistical Interactions in Factorial Experiments.",
-               "Communications in Statistics - Simulation and Computation.",
+               "Journal of Agronomy and Crop Science.",
                "http://doi.wiley.com/10.1111/jac.12076"),
          header = "Please cite the statint package by the following reference:"
 )
