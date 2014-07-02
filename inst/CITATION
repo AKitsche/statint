@@ -1,6 +1,7 @@
 citEntry(entry="Article",
          title = "Analysis of Statistical Interactions in Factorial Experiments",
-         author = as.person("Andreas Kitsche","Frank Schaarschmidt"),
+         author = personList(as.person("Andreas Kitsche"),
+                             as.person("Frank Schaarschmidt")),
          journal      = "Journal of Agronomy and Crop Science",
          year         = "2014",
          doi          = "http://doi.wiley.com/10.1111/jac.12076",
